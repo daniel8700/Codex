@@ -1,46 +1,61 @@
-from math import isqrt
-from typing import Iterable, List
+import re
 
 
-def numeros_primos(numeros: Iterable[int]) -> List[int]:
-    """Devuelve una lista con los números primos encontrados en ``numeros``.
+def identificar_intencion(mensaje: str) -> str:
+    """Clasifica la intención del usuario usando reglas basadas en expresiones regulares."""
+    mensaje = mensaje.strip().lower()
 
-    Args:
-        numeros: Cualquier iterable de enteros.
+    # Las reglas se evalúan en orden: cada una busca palabras clave que
+    # indiquen una intención específica. Si se detecta un patrón se devuelve
+    # la etiqueta correspondiente.
+    if re.search(r"\b(hola|buen[ao]s? (d[ií]as|tardes|noches))\b", mensaje):
+        return "saludo"
+    if re.search(r"\b(ad[ií]os|hasta luego|nos vemos|chao)\b", mensaje):
+        return "despedida"
+    if re.search(r"\b(c[oó]mo est[aá]s|qu[eé] tal)\b", mensaje):
+        return "estado"
+    if re.search(r"\b(clima|tiempo|temperatura|climat[oó]logo)\b", mensaje):
+        return "clima"
+    if re.search(r"\b(hora|tiempo actual|reloj)\b", mensaje):
+        return "hora"
+    if re.search(r"\b(c[oó]mo te llamas|tu nombre|qui[eé]n eres)\b", mensaje):
+        return "nombre"
 
-    Returns:
-        Lista que contiene únicamente los valores primos en el orden en el que
-        aparecieron en ``numeros``.
-    """
-    primos: List[int] = []
-
-    for numero in numeros:
-        if es_primo(numero):
-            primos.append(numero)
-
-    return primos
+    return "desconocido"
 
 
-def es_primo(numero: int) -> bool:
-    """Determina si ``numero`` es un número primo."""
-    if numero < 2:
-        return False
+def generar_respuesta(intencion: str) -> str:
+    """Genera una respuesta según la intención detectada."""
+    if intencion == "saludo":
+        return "¡Hola! ¿En qué puedo ayudarte hoy?"
+    if intencion == "despedida":
+        return "¡Hasta luego! Gracias por conversar conmigo."
+    if intencion == "estado":
+        return "Estoy muy bien, gracias por preguntar. ¿Y tú?"
+    if intencion == "clima":
+        return "No tengo acceso al clima en tiempo real, pero espero que el día esté agradable."
+    if intencion == "hora":
+        return "No puedo ver un reloj, pero te recomiendo revisar tu dispositivo."
+    if intencion == "nombre":
+        return "Soy un chatbot sencillo listo para charlar contigo."
 
-    if numero in (2, 3):
-        return True
+    return "Lo siento, aún estoy aprendiendo y no entendí tu mensaje."
 
-    if numero % 2 == 0:
-        return False
 
-    limite = isqrt(numero)
-    divisor = 3
-    while divisor <= limite:
-        if numero % divisor == 0:
-            return False
-        divisor += 2
+def iniciar_chat() -> None:
+    """Mantiene un bucle de conversación hasta que el usuario escriba 'salir'."""
+    print("Bienvenido al chatbot. Escribe 'salir' para terminar la conversación.\n")
 
-    return True
+    while True:
+        mensaje = input("Tú: ").strip()
+        if mensaje.lower() == "salir":
+            print("Chatbot: ¡Hasta pronto!")
+            break
+
+        intencion = identificar_intencion(mensaje)
+        respuesta = generar_respuesta(intencion)
+        print(f"Chatbot: {respuesta}")
 
 
 if __name__ == "__main__":
-    print("Hola desde Codex!")
+    iniciar_chat()
